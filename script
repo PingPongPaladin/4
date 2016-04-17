@@ -1,11 +1,13 @@
 torus
 0 50 35 540
-torus
-0 100 35 90
+sphere
+-10 -200 40
 torus
 0 200 30 80
 box
 -200 400 0 50 50 50
+box
+-75 100 -10 150 100 20
 ident
 xrotate
 30
