@@ -66,22 +66,17 @@ void generate_sphere( struct matrix * points,
 											double step ) {
   double i;
   struct matrix * temp;
-	/* from notes */
-	/*  1     0        0     0   rcos(theta)   x */
-	/* 	0 cos(phi) -sin(phi) 0 * rsin(theta) = y */
-	/* 	0 sin(phi)  cos(phi) 0       1         z */
-	/* 	0     0        0     1       0           */
+  // the correct matrix should be
+	//      1     0        0     0   rcos(theta)   x
+	// 	0 cos(phi) -sin(phi) 0 * rsin(theta) = y
+	// 	0 sin(phi)  cos(phi) 0       1         z
+	// 	0     0        0     1       0          
 
-	
 	for (i = 0; i < M_PI / 2; i += step) {
 		add_circle(points, cx, cy, r, step);
-
 		temp = make_translate(-1*cx, 0, 0);
-
-		//rotate
 		matrix_mult(make_rotX(i), temp);
 		matrix_mult(temp, points);
-
 		temp = make_translate(cx, 0, 0);
 		matrix_mult(temp, points);
 	}
@@ -110,9 +105,7 @@ void add_torus( struct matrix * points,
 								double step ) {
   struct matrix *temp;
   temp = new_matrix(4,1);
-
   generate_torus(temp, cx, cy, r1, r2, step);
-
   int col;
   for(col = 0; col < temp->cols; col++) {
     add_edge(points,
@@ -144,14 +137,11 @@ void generate_torus( struct matrix * points,
 										 double step ) {
   double i;
   struct matrix * temp;
-  
   for (i = 0; i < M_PI; i += step) {
     add_circle(points, cx, cy, r2 - r1, step);
-    
     temp = make_translate(-1*cx + r1, 0, 0);
     matrix_mult(make_rotZ(i), temp);
     matrix_mult(temp, points);
-
     temp = make_translate(cx - r1, 0, 0);
     matrix_mult(temp, points);
   }
@@ -183,7 +173,6 @@ void add_box( struct matrix * points,
   add_edge(points, x + width, y, z, x + width, y, z);
   add_edge(points, x, y + height, z, x, y + height, z);
   add_edge(points, x + width, y + height, z, x + width, y + height, z);
-  
   add_edge(points, x, y, z + depth, x, y, z + depth);
   add_edge(points, x + width, y, z + depth, x + width, y, z + depth);
   add_edge(points, x, y + height, z + depth, x, y + height, z + depth);
@@ -207,20 +196,15 @@ void add_circle( struct matrix * points,
 								 double r, double step ) {
   
   double x0, y0, x, y, t;
-  
   x0 = cx + r;
   y0 = cy;
-
   for ( t = step; t <= 1; t+= step ) {
-    
     x = r * cos( 2 * M_PI * t ) + cx;
     y = r * sin( 2 * M_PI * t ) + cy;
-    
     add_edge( points, x0, y0, 0, x, y, 0 );
     x0 = x;
     y0 = y;
   }
-
   add_edge( points, x0, y0, 0, cx + r, cy, 0 );
 }
 
@@ -255,31 +239,20 @@ void add_curve( struct matrix *points,
   double x, y, t;
   struct matrix * xcoefs;
   struct matrix * ycoefs;
-  
-  //generate the coeficients
+  // coeficients
   if ( type == BEZIER_MODE ) {
     ycoefs = generate_curve_coefs(y0, y1, y2, y3, BEZIER_MODE);
     xcoefs = generate_curve_coefs(x0, x1, x2, x3, BEZIER_MODE);
   }
-
-  else {
+  else { //all other cases
     xcoefs = generate_curve_coefs(x0, x1, x2, x3, HERMITE_MODE);
     ycoefs = generate_curve_coefs(y0, y1, y2, y3, HERMITE_MODE);
   }
-
-  /*
-  printf("a = %lf b = %lf c = %lf d = %lf\n", xcoefs->m[0][0],
-         xcoefs->m[1][0], xcoefs->m[2][0], xcoefs->m[3][0]);
-  */
-
   for (t=step; t <= 1; t+= step) {
-    
     x = xcoefs->m[0][0] * t * t * t + xcoefs->m[1][0] * t * t
       + xcoefs->m[2][0] * t + xcoefs->m[3][0];
-
     y = ycoefs->m[0][0] * t * t * t + ycoefs->m[1][0] * t * t
       + ycoefs->m[2][0] * t + ycoefs->m[3][0];
-
     add_edge(points, x0, y0, 0, x, y, 0);
     x0 = x;
     y0 = y;
@@ -299,15 +272,12 @@ adds point (x, y, z) to points and increment points.lastcol
 if points is full, should call grow on points
 ====================*/
 void add_point( struct matrix * points, double x, double y, double z) {
-  
   if ( points->lastcol == points->cols )
     grow_matrix( points, points->lastcol + 100 );
-
   points->m[0][points->lastcol] = x;
   points->m[1][points->lastcol] = y;
   points->m[2][points->lastcol] = z;
   points->m[3][points->lastcol] = 1;
-
   points->lastcol++;
 }
 
@@ -334,17 +304,12 @@ Go through points 2 at a time and call draw_line to add that line
 to the screen
 ====================*/
 void draw_lines( struct matrix * points, screen s, color c) {
-
   int i;
- 
   if ( points->lastcol < 2 ) {
-    
     printf("Need at least 2 points to draw a line!\n");
     return;
   }
-
   for ( i = 0; i < points->lastcol - 1; i+=2 ) {
-
     draw_line( points->m[0][i], points->m[1][i], 
 	       points->m[0][i+1], points->m[1][i+1], s, c);
   } 	       
@@ -352,27 +317,20 @@ void draw_lines( struct matrix * points, screen s, color c) {
 
 
 void draw_line(int x0, int y0, int x1, int y1, screen s, color c) {
- 
   int x, y, d, dx, dy;
-
   x = x0;
   y = y0;
-  
-  //swap points so we're always draing left to right
+  //swap points
   if ( x0 > x1 ) {
     x = x1;
     y = y1;
     x1 = x0;
     y1 = y0;
   }
-
-  //need to know dx and dy for this version
   dx = (x1 - x) * 2;
   dy = (y1 - y) * 2;
-
   //positive slope: Octants 1, 2 (5 and 6)
   if ( dy > 0 ) {
-
     //slope < 1: Octant 1 (5)
     if ( dx > dy ) {
       d = dy - ( dx / 2 );
