@@ -109,28 +109,28 @@ void parse_file ( char * filename,
       //printf( "%lf %lf %lf\n", x, y, z);
     }
 
-		// New Code
+    // Start of added code
 		
-		else if ( strncmp(line, "box", strlen(line)) == 0 ) {
-      //printf("BOX!\n");
+    else if ( strncmp(line, "box", strlen(line)) == 0 ) {
+      //Box
       fgets(line, 255, f);
       sscanf(line, "%lf %lf %lf %lf %lf %lf", &x, &y, &z, &x1, &y1, &z1);
       add_box(pm, x, y, z, x1, y1, z1);
     }  
     else if ( strncmp(line, "torus", strlen(line)) == 0 ) {
-      //printf("TORUS!\n");
+      //torus
       fgets(line, 255, f);
       sscanf(line, "%lf %lf %lf %lf", &x, &y, &x1, &y1);
       add_torus(pm, x, y, x1, y1, 0.02);
     }   
     else if ( strncmp(line, "sphere", strlen(line)) == 0 ) {
-      //printf("SPHERE!\n");
+      //sphere
       fgets(line, 255, f);
       sscanf(line, "%lf %lf %lf", &x, &y, &z);
       add_sphere(pm, x, y, z, 0.01);
     }
 
-		// End New Code
+    // End of added code
 		
     else if ( strncmp(line, "bezier", strlen(line)) == 0 ) {
       //printf("BEZIER\n");
